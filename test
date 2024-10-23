@@ -1,0 +1,67 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
+
+namespace UnitTestProject
+{
+    [TestClass]
+    public class UnitTest1
+    {
+        public TestContext TestContext { get; set; }
+
+        // Đọc dữ liệu từ file CSV
+        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.CSV", "|DataDirectory|\\data.csv", "Data#csv", DataAccessMethod.Sequential)]
+        [TestMethod]
+        public void TestPrimeNumbersInRange_DataDriven()
+        {
+            // Lấy dữ liệu từ DataRow
+            int a = int.Parse(TestContext.DataRow["a"].ToString());
+            int b = int.Parse(TestContext.DataRow["b"].ToString());
+            string expected = TestContext.DataRow["expected"].ToString();
+
+            // Gọi hàm kiểm tra logic chính
+            List<int> primeNumbers = new List<int>();
+
+            for (int i = a; i <= b; i++)
+            {
+                if (IsPrime(i) && IsPrime(SumOfDigits(i)))
+                {
+                    primeNumbers.Add(i);
+                }
+            }
+
+            // Chuyển primeNumbers thành chuỗi để so sánh với expected
+            string actual = string.Join(" ", primeNumbers);
+
+            // Kiểm tra kết quả
+            Assert.AreEqual(expected, actual, $"Prime numbers in range {a} to {b} không khớp.");
+        }
+
+        // Hàm kiểm tra số nguyên tố
+        public static bool IsPrime(int n)
+        {
+            if (n <= 1) return false;
+            if (n == 2) return true;
+            if (n % 2 == 0) return false;
+
+            for (int i = 3; i * i <= n; i += 2)
+            {
+                if (n % i == 0) return false;
+            }
+
+            return true;
+        }
+
+        // Hàm tính tổng các chữ số
+        public static int SumOfDigits(int n)
+        {
+            int sum = 0;
+            while (n > 0)
+            {
+                sum += n % 10;
+                n /= 10;
+            }
+            return sum;
+        }
+    }
+}
